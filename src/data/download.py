@@ -1,9 +1,7 @@
 import os
 import logging
 import pandas as pd
-from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
-
+from src.utils.paths import get_parent_dir
 
 class CSSEDownloader(object):
     """
@@ -70,15 +68,12 @@ class CSSEDownloader(object):
         return ts_data
 
 
-def main(project_dir,
-         output_dir="data/raw"):
+def main(output_dir="data/raw"):
     """
     Downloads latest CSSE time series data into output_dir.
 
     Parameters
     ----------
-    project_dir : str
-        Path to project directory of 'bdproject'.
     output_dir : str
         Output directory, ../raw per default.
 
@@ -90,11 +85,10 @@ def main(project_dir,
     logger = logging.getLogger(__name__)
     logger.info('Downloading latest CSSE raw data.')
 
-    # TODO: resolve whether to specify project_dir within the main function
-    #  or outside.
     # path to project directory "bdproject" (should work for niklas and felix)
     #project_dir = os.path.abspath(os.path.join(
-    #    os.path.dirname(os.getcwd()), '..'))
+    #    os.path.dirname(__file__), '../..'))
+    project_dir = get_parent_dir(up=2)
 
     # download and save files to ../raw
     for granularity_level in ['US', 'global']:
@@ -116,11 +110,5 @@ if __name__=="__main__":
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
-    # find dir of 'bdproject'
-    project_dir = Path(__file__).resolve().parents[2]
-
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
-
     # run download
-    main(project_dir)
+    main()
