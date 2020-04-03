@@ -9,13 +9,11 @@ The project is being supervised by
 [Elliot Ash](https://elliottash.com/), of ETH Zurich's Center for Law
 & Economics' [Law, Economics and Data Science Group](https://lawecondata.ethz.ch/).
 
-Research Question
+Abstract
 ------------
 **Which policies are most effective in combating COVID-19? 
 Leveraging panel regression and sentiment analysis in the United States.**
 
-Abstract
-------------
 Success in combating COVID-19 depends on multiple factors. Timing and 
 extent of well-informed policies, guidelines and laws are important. 
 Collaboration at practically all governance levels is needed. Lastly, societal 
@@ -59,14 +57,14 @@ to come.
 
 Any suggestions?
 ------------
-To be honest, we are total newbies in this field. If you ...
+To be honest, we are total newbies in this field. If you...
 
 * have any suggestions on how we could improve the approach, 
 * know about interesting methodologies that might fit the project,
 * know data sources that could fit our purpose,
 * want to critique the approach in any constructive way
 
-we would be really happy to learn about your ideas. Simply shoot us an 
+we would be really happy to learn about your ideas - simply shoot us an 
 [email](mailto:fzaussinger@student.ethz.ch,nstolz@student.ethz.ch). Thanks!
 
 Project Organization
