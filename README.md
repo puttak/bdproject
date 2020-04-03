@@ -11,8 +11,8 @@ The project is being supervised by
 
 Research Question
 ------------
-**Which policies are most effective in combating COVID-19? Leveraging panel
-regression and sentiment analysis in the United States.**
+**Which policies are most effective in combating COVID-19? 
+Leveraging panel regression and sentiment analysis in the United States.**
 
 Abstract
 ------------
