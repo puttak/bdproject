@@ -18,9 +18,8 @@ def main(fpath_in="data/raw", fpath_out="data/processed"):
     raw_dir = os.path.join(project_dir, fpath_in)
 
     # iterate over csv files, split into time series and ancillary part and save
-    # TODO: extend to global data. Should we keep the country-level data
-    #  for the US? I think yes. We should have a reader in which we can then
-    #  specify that it should dynamically aggregate the data to the state-level.
+    # TODO: extend to global data. could be made nicer by creating a CSSE data
+    #  class which stores the default structure.
     for granularity_level in ['US']:
         file_dir = os.path.join(raw_dir, granularity_level)
         # process
@@ -32,18 +31,20 @@ def main(fpath_in="data/raw", fpath_out="data/processed"):
             # drop all cols apart from Province_States and the time series data
             ancillary_cols = ['Unnamed: 0', 'UID', 'iso2', 'iso3', 'code3',
                               'FIPS', 'Admin2', 'Country_Region', 'Lat',
-                              'Long_', 'Combined_Key']
+                              'Long_', 'Province_State']
             if 'Population' in ts_raw.columns:
                 ancillary_cols.append('Population')
 
             # split into time series and ancillary data per state
-            # TODO: reindex data frame and set datetime index
             ts_clean = (ts_raw.drop(columns=ancillary_cols)
-                        # TODO: think about merging state and county names
-                        #  and thusby keeping all information
-                        .groupby("Province_State").sum()
-                        .transpose())
-            ancillary_cols.append('Province_State')
+                        .set_index('Combined_Key')
+                        .transpose()
+                        )
+            # to datetime index
+            ts_clean.index = pd.to_datetime(ts_clean.index, format='%m/%d/%y')
+
+            # ancillary data
+            ancillary_cols.append('Combined_Key')
             ancillary_clean = (ts_raw[ancillary_cols]
                                .drop(columns=['Unnamed: 0']))
 
