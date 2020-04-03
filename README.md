@@ -25,12 +25,10 @@ To this end, the U.S. provides an interesting case as a federal country which
 government has been delaying broad interventions to combat the pandemic for a 
 prolonged period of time. This led to sub-national governance level actors
 such as states, counties and municipalities taking the lead within their 
-specific mandates. As a result, response strategies were likely heterogeneous  
-over space and time. 
-
-We want to apply panel regression and sentiment analysis to disentangle the 
-effect of state and national level policy interventions on reducing the number 
-of infections and deaths due to COVID-19. 
+specific mandates. As a result, response strategies were likely heterogeneous 
+over space and time. The goal of this project is to apply panel regression and 
+sentiment analysis to disentangle the effect of state and national level policy 
+interventions on reducing the number of infections and deaths due to COVID-19. 
 
 In a first step, we will manually code policy interventions such as guidelines, 
 laws, and health infrastructure investments at the state-level over time. 
@@ -61,14 +59,14 @@ to come.
 
 Any suggestions?
 ------------
-We are pretty much total newbies in this field. If you ...
+To be honest, we are total newbies in this field. If you ...
 
 * have any suggestions on how we could improve the approach, 
 * know about interesting methodologies that might fit the project,
 * know data sources that could fit our purpose,
 * want to critique the approach in any constructive way
 
-we would highly appreciate if you shoot us an 
+we would be really happy to learn about your ideas. Simply shoot us an 
 [email](mailto:fzaussinger@student.ethz.ch,nstolz@student.ethz.ch). Thanks!
 
 Project Organization
