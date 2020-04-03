@@ -1,6 +1,6 @@
 bdproject
 ==============================
-This is the repository of our 2020 course project in **ETH Zurich's 
+This is the repository of the 2020 course project in **ETH Zurich's 
 Big Data and Public Policy** course. The team members are 
 [Niklas Stolz](https://www.linkedin.com/in/niklas-stolz-54153114b/) 
 and [Felix Zaussinger](https://www.linkedin.com/in/felix-zaussinger-3bb62510b/). 
