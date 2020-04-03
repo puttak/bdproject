@@ -19,6 +19,7 @@ def run_pipeline():
     logger.info('Programme pipeline executed.')
     return None
 
+
 if __name__ == "__main__":
     # set logging parameters
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

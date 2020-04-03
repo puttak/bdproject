@@ -1,7 +1,10 @@
 bdproject
 ==============================
 
-Code of our 2020 course project in big data and public policy.
+Code for a 2020 course project in ETH Zurich's Big Data and Public Policy
+course. The project is being supervised by Malka Guillot and Elliot Ash. 
+
+Team members: Niklas Stolz and Felix Zaussinger
 
 Project Organization
 ------------
@@ -16,6 +19,8 @@ Project Organization
     │   └── raw            <- The original, immutable data dump.
     │
     ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+    │
+    ├── logs               <- Log files, for now of the main programme pipeline.
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
@@ -35,16 +40,22 @@ Project Organization
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
+    │   ├── data           <- Scripts to download or transform data
+    │   │   └── download.py
+    │   │   └── reader.py
+    │   │   └── split_csse_data.py
+    │   │   └── structures.py    
     │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
+    │   ├── features       <- Scripts to turn processed data into features for modeling
     │   │   └── build_features.py
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
     │   │   ├── predict_model.py
     │   │   └── train_model.py
+    │   │
+    │   ├── utils       <- Utility functions to be used elsewhere.
+    │   │   └── paths.py
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
