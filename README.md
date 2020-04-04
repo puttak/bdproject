@@ -6,7 +6,7 @@ Big Data and Public Policy** course. The team members are
 and [Felix Zaussinger](https://www.linkedin.com/in/felix-zaussinger-3bb62510b/). 
 The project is being supervised by 
 [Malka Guillot](https://malkaguillot.weebly.com/) and 
-[Elliot Ash](https://elliottash.com/), of ETH Zurich's Center for Law
+[Elliott Ash](https://elliottash.com/), of ETH Zurich's Center for Law
 & Economics' [Law, Economics and Data Science Group](https://lawecondata.ethz.ch/).
 
 Abstract
