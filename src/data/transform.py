@@ -5,7 +5,7 @@ import pandas as pd
 from src.utils.paths import get_parent_dir
 
 
-def main(fpath_in="data/raw", fpath_out="data/processed"):
+def csse_main(fpath_in="data/raw/csse", fpath_out="data/processed/csse"):
     """
     Runs data processing scripts to turn raw data from (../raw) into
     cleaned data ready to be analyzed (saved in ../processed).
@@ -61,4 +61,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # run main
-    main()
+    csse_main()
