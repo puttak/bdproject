@@ -104,7 +104,7 @@ Project Organization
     │   ├── data           <- Scripts to download or transform data
     │   │   └── download.py
     │   │   └── reader.py
-    │   │   └── split_csse_data.py
+    │   │   └── transform.py
     │   │   └── structures.py    
     │   │
     │   ├── features       <- Scripts to turn processed data into features for modeling
