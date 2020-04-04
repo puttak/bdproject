@@ -1,7 +1,7 @@
 import os
 import logging
 from src.utils.paths import get_parent_dir
-from src.data import download, split_csse_data
+from src.data import download, transform
 
 
 def run_pipeline():
@@ -13,8 +13,8 @@ def run_pipeline():
     logger.info('Starting programme pipeline.')
 
     # run steps
-    download.main()
-    split_csse_data.main()
+    download.csse_main()
+    transform.csse_main()
 
     logger.info('Programme pipeline executed.')
     return None
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO,
                         format=log_fmt,
                         filename=logfile,
-                        filemode='w')
+                        filemode='a')
 
     # run
     run_pipeline()

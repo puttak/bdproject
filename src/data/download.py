@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from src.utils.paths import get_parent_dir
 
+
 class CSSEDownloader(object):
     """
     Implements a downloader for the COVID-19 data from John Hopkins University
@@ -68,7 +69,7 @@ class CSSEDownloader(object):
         return ts_data
 
 
-def main(output_dir="data/raw"):
+def csse_main(output_dir="data/raw/csse"):
     """
     Downloads latest CSSE time series data into output_dir.
 
@@ -111,4 +112,4 @@ if __name__=="__main__":
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # run download
-    main()
+    csse_main()
