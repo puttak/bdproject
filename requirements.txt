@@ -196,6 +196,7 @@ webencodings=0.5.1=py_1
 wheel=0.34.2=py_1
 whichcraft=0.6.1=py_0
 widgetsnbextension=3.5.1=py37_0
+xarray=0.15.1=py_0
 xlrd=1.2.0=py_0
 xz=5.2.4=h0b31af3_1002
 yaml=0.2.2=h0b31af3_1
