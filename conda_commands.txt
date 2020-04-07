@@ -1,0 +1,5 @@
+# export environment file without prefix and sub-dependencies
+conda env export --from-history | grep -v "^prefix: " > environment.yml
+
+# export requirements file
+conda list --from-history > requirements.txt

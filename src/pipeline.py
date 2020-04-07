@@ -29,5 +29,6 @@ if __name__ == "__main__":
                         filename=logfile,
                         filemode='a')
 
+    print(os.getcwd())
     # run
-    run_pipeline()
+    #run_pipeline()
