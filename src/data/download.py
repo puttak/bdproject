@@ -7,7 +7,7 @@ from src.utils.paths import get_parent_dir
 class CSSEDownloader(object):
     """
     Implements a downloader for the COVID-19 data from John Hopkins University
-    CSSE. It can be found here: https://github.com/CSSEGISandData/COVID-19.
+    CSSE. Link to data: https://github.com/CSSEGISandData/COVID-19.
     """
     def __init__(self, granularity='US'):
         """
