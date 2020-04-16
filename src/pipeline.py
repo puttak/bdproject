@@ -1,22 +1,29 @@
 import os
 import logging
 from src.utils.paths import get_parent_dir
-from src.data import download, transform
+from src.data.download import CSSEDownloader
+from src.data import transform
 
 
 def run_pipeline():
     """
-    Run all programme steps. This includes download, processing, transformation,
-    prediction and visualization.
+    Run all steps. This includes download, processing, transformation,
+    feature extraction, model training, prediction and visualization.
     """
     logger = logging.getLogger(__name__)
     logger.info('Starting programme pipeline.')
 
     # run steps
-    download.csse_main()
+    # -------------------------------------------------------------------------
+    # 1) Download latest data
+    CSSEDownloader(dirname='csse').save_data()
+
+    # 2) transform data
     transform.csse_main()
 
-    logger.info('Programme pipeline executed.')
+    # 3) ...
+
+    logger.info('Programme pipeline successfully executed.')
     return None
 
 
@@ -29,5 +36,5 @@ if __name__ == "__main__":
                         filename=logfile,
                         filemode='a')
 
-    # run
+    # execute pipeline
     run_pipeline()

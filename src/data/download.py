@@ -1,115 +1,57 @@
 import os
 import logging
 import pandas as pd
-from src.utils.paths import get_parent_dir
+from src.data.structure import Download, CSSE
 
 
-class CSSEDownloader(object):
-    """
-    Implements a downloader for the COVID-19 data from John Hopkins University
-    CSSE. Link to data: https://github.com/CSSEGISandData/COVID-19.
-    """
-    def __init__(self, granularity='US'):
+class CSSEDownloader(CSSE, Download):
+    def __init__(self, dirname):
+        CSSE.__init__(self, dirname)
+        Download.__init__(self)
+
+        self.dirname = dirname
+        self.web_dir = os.path.join(
+            "https://raw.githubusercontent.com",
+            "CSSEGISandData",
+            "COVID-19",
+            "master",
+            "csse_covid_19_data",
+            "csse_covid_19_time_series")
+
+    def fetch_data(self):
         """
-        Initialize class with data granularity.
-
-        Parameters
-        ----------
-        granularity : str
-            Data granularity parameter. One of ["US", "global"].
-        """
-        # check for valid granularity level
-        if granularity not in ['US', 'global']:
-            raise FileNotFoundError("Granularity level does not exist. "
-                                    "Choose 'US' or 'global'.)")
-        self.granularity = granularity
-        # define data directory
-        self.csse_dir = os.path.join("https://raw.githubusercontent.com",
-                                     "CSSEGISandData",
-                                     "COVID-19",
-                                     "master",
-                                     "csse_covid_19_data",
-                                     "csse_covid_19_time_series")
-        # define time series (ts) file structure
-        self.ts_confirmed = \
-            os.path.join(self.csse_dir,
-                         "time_series_covid19_confirmed_{}.csv".format(
-                             granularity))
-        self.ts_deaths = \
-            os.path.join(self.csse_dir,
-                         "time_series_covid19_deaths_{}.csv".format(
-                             granularity))
-        if granularity == 'global':
-            self.ts_recovered = \
-                os.path.join(self.csse_dir,
-                             "time_series_covid19_recovered_{}.csv".format(
-                                 granularity))
-
-    def fetch_ts(self):
-        """
-        Fetch time series data based on the given granularity level.
+        Fetch US time series data.
 
         Returns
         -------
-        ts_data : pd.DataFrame
-            Time series data
+        data : pd.DataFrame
+            CSSE time series data
         """
-        #
-        ts_data = {}
-        if self.granularity == 'US':
-            ts_data['confirmed'] = pd.read_csv(self.ts_confirmed)
-            ts_data['deaths'] = pd.read_csv(self.ts_deaths)
-        elif self.granularity == 'global':
-            ts_data['confirmed'] = pd.read_csv(self.ts_confirmed)
-            ts_data['deaths'] = pd.read_csv(self.ts_deaths)
-            ts_data['recovered'] = pd.read_csv(self.ts_recovered)
-        else:
-            raise ImportError("Granularity level does not exist. CSSE time "
-                              "series data could not be loaded.")
-        return ts_data
+        data = {}
 
+        self.path_confirmed = os.path.join(self.web_dir, self.fname_confirmed)
+        self.path_deaths = os.path.join(self.web_dir, self.fname_deaths)
 
-def csse_main(output_dir="data/raw/csse"):
-    """
-    Downloads latest CSSE time series data into output_dir.
+        data['confirmed'] = pd.read_csv(self.path_confirmed)
+        data['deaths'] = pd.read_csv(self.path_deaths)
+        return data
 
-    Parameters
-    ----------
-    output_dir : str
-        Output directory, ../raw per default.
+    def save_data(self):
+        """
+        Save CSSE data to ../raw
+        """
+        logger = logging.getLogger(__name__)
+        logger.info('Downloading latest CSSE raw data.')
 
-    Returns
-    -------
+        # fetch latest data from github repository
+        data = self.fetch_data()
 
-    """
-    # logging
-    logger = logging.getLogger(__name__)
-    logger.info('Downloading latest CSSE raw data.')
-
-    # path to project directory "bdproject" (should work for niklas and felix)
-    #project_dir = os.path.abspath(os.path.join(
-    #    os.path.dirname(__file__), '../..'))
-    project_dir = get_parent_dir(up=2)
-
-    # download and save files to ../raw
-    for granularity_level in ['US', 'global']:
-        downloader = CSSEDownloader(granularity=granularity_level)
-        data = downloader.fetch_ts()
         # iterate over dictionary of data frames and save to csv
-        for key in data.keys():
-            fname = \
-                "time_series_covid19_" \
-                "{type}_{granularity}.csv".format(type=key,
-                                                  granularity=granularity_level)
-            data[key].to_csv(os.path.join(project_dir,
-                                          output_dir,
-                                          granularity_level,
-                                          fname))
+        for category in data.keys():
+            fname = "time_series_covid19_{type}_US.csv".format(type=category)
+            data[category].to_csv(os.path.join(self.raw_dir_csse, 'US', fname))
 
-if __name__=="__main__":
-    # turn on logging
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
 
-    # run download
-    csse_main()
+if __name__ == "__main__":
+    downloader = CSSEDownloader(dirname="csse")
+    downloader.save_data()
