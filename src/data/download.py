@@ -2,6 +2,13 @@ import os
 import logging
 import pandas as pd
 from src.utils.paths import get_parent_dir
+from src.data.structure import Download
+
+
+class CSSEDownloaderNew(Download):
+    def __init__(self):
+        super(Download, self).__init__()
+        pass
 
 
 class CSSEDownloader(object):
@@ -64,7 +71,7 @@ class CSSEDownloader(object):
             ts_data['deaths'] = pd.read_csv(self.ts_deaths)
             ts_data['recovered'] = pd.read_csv(self.ts_recovered)
         else:
-            raise ImportError("Granularity level does not exist. CSSE time "
+            raise ImportError("Granularity level does not exist. CSSE time"
                               "series data could not be loaded.")
         return ts_data
 

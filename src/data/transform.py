@@ -3,6 +3,13 @@ import os
 import logging
 import pandas as pd
 from src.utils.paths import get_parent_dir
+from src.data.structure import Transform
+
+
+class CSSETransform(Transform):
+    def __init__(self):
+        super(CSSETransform, self).__init__()
+        pass
 
 
 def csse_main(fpath_in="data/raw/csse", fpath_out="data/processed/csse"):
