@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 
@@ -15,4 +16,5 @@ def get_parent_dir(up=1):
     path : str
         Path to directory.
     """
-    return Path(__file__).resolve().parents[up]
+    return str(Path(__file__).resolve().parents[up])
+

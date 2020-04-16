@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 from src.utils.paths import get_parent_dir
 from src.data.structure import Transform
-
+from src.data.reader import CSSE
 
 class CSSETransform(Transform):
     def __init__(self):
