@@ -59,7 +59,7 @@ class Reader(Data):
     Basic reader class.
     """
     def __init__(self):
-        super(Reader, self).__init__()
+        Data.__init__(self)
 
     def read_raw(self):
         raise NotImplementedError
@@ -73,7 +73,7 @@ class Transformer(Reader):
     Basic class for data transformation.
     """
     def __init__(self):
-        super(Transformer, self).__init__()
+        Reader.__init__(self)
 
     def raw2processed(self):
         raise NotImplementedError
