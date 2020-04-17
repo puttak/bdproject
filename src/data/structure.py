@@ -37,13 +37,13 @@ class Data(object):
                 os.makedirs(data_dir)
 
 
-class Download(Data):
+class Downloader(Data):
     """
     Basic download class. Inherits from Data class. Needs to implement methods
     for fetching and saving data.
     """
     def __init__(self, webdir=""):
-        super(Download, self).__init__()
+        super(Downloader, self).__init__()
         self.web_dir = webdir
         assert isinstance(self.web_dir, str)
 
@@ -68,12 +68,12 @@ class Reader(Data):
         raise NotImplementedError
 
 
-class Transform(Reader):
+class Transformer(Reader):
     """
     Basic class for data transformation.
     """
     def __init__(self):
-        super(Transform, self).__init__()
+        super(Transformer, self).__init__()
 
     def raw2processed(self):
         raise NotImplementedError
@@ -81,7 +81,7 @@ class Transform(Reader):
 
 class CSSE(Data):
     """
-    ...
+    Defines structure of CSSE data for raw and processed stage.
     """
     def __init__(self, dirname):
         """
