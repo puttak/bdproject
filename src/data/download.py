@@ -1,13 +1,13 @@
 import os
 import logging
 import pandas as pd
-from src.data.structure import Download, CSSE
+from src.data.structure import Downloader, CSSE
 
 
-class CSSEDownloader(CSSE, Download):
+class CSSEDownloader(CSSE, Downloader):
     def __init__(self, dirname):
         CSSE.__init__(self, dirname)
-        Download.__init__(self)
+        Downloader.__init__(self)
 
         self.dirname = dirname
         self.web_dir = os.path.join(
@@ -50,6 +50,7 @@ class CSSEDownloader(CSSE, Download):
         for category in data.keys():
             fname = "time_series_covid19_{type}_US.csv".format(type=category)
             data[category].to_csv(os.path.join(self.raw_dir_csse, 'US', fname))
+        return None
 
 
 if __name__ == "__main__":

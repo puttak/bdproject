@@ -3,6 +3,7 @@ import logging
 from src.utils.paths import get_parent_dir
 from src.data.download import CSSEDownloader
 from src.data import transform
+from src.data.transform import CSSETransformer
 
 
 def run_pipeline():
@@ -19,7 +20,7 @@ def run_pipeline():
     CSSEDownloader(dirname='csse').save_data()
 
     # 2) transform data
-    transform.csse_main()
+    CSSETransformer(dirname='csse').raw2processed()
 
     # 3) ...
 
