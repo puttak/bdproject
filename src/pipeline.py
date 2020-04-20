@@ -1,4 +1,5 @@
 import os
+import time
 import logging
 from src.utils.paths import get_parent_dir
 from src.data.download import CSSEDownloader
@@ -10,6 +11,7 @@ def run_pipeline():
     Run all steps. This includes download, processing, transformation,
     feature extraction, model training, prediction and visualization.
     """
+    start_time = time.time()
     logger = logging.getLogger(__name__)
     logger.info('Starting programme pipeline.')
 
@@ -20,10 +22,14 @@ def run_pipeline():
 
     # 2) transform data
     CSSETransformer(dirname='csse').raw2processed()
+    CSSETransformer(dirname='csse').processed2ds()
 
-    # 3) ...
+    # 3) extract features
+    # ...
 
-    logger.info('Programme pipeline successfully executed.')
+    execution_time = time.time() - start_time
+    logger.info('Programme pipeline successfully '
+                'executed in {:.2f} seconds.'.format(execution_time))
     return None
 
 
