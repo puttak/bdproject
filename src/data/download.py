@@ -160,7 +160,7 @@ class TwitterNewsDownloader(TwitterNews, Downloader):
 
 
 if __name__ == "__main__":
-    #downloader = CSSEDownloader(dirname="csse")
-    #downloader.save_data()
-    twitterdownloader=TwitterNewsDownloader(dirname="twitter_news")
-    twitterdownloader.save_data(usernames=["nytimes")
+    downloader = CSSEDownloader(dirname="csse")
+    downloader.save_data()
+    #twitterdownloader=TwitterNewsDownloader(dirname="twitter_news")
+    #twitterdownloader.save_data(usernames=["nytimes")
