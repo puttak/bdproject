@@ -205,3 +205,6 @@ ENV/
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+
+#private config file
+config.ini

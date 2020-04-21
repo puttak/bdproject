@@ -12,7 +12,9 @@ The following basic structures are implemented so far:
 
 import os
 from src.utils.paths import get_parent_dir
-
+from configparser import ConfigParser
+from tweepy import OAuthHandler
+import tweepy
 
 class Data(object):
     """
@@ -102,3 +104,35 @@ class CSSE(Data):
         # define file name structure
         self.fname_confirmed = "time_series_covid19_confirmed_US.csv"
         self.fname_deaths = "time_series_covid19_deaths_US.csv"
+
+
+
+class TwitterNews(Data):
+    def __init__(self, dirname):
+        """
+        Initialize class with Tweepy credentials
+
+        Parameters
+        ----------
+         : str
+
+        """
+        # initialise mother class: now this class inherited the Data class
+        super(TwitterNews, self).__init__()
+        self.dirname = dirname
+
+        # at this stage, re-define dirs based on dirname variable
+        self.processed_dir_twitternews = os.path.join(self.processed_dir, self.dirname)
+        self.raw_dir_twitternews = os.path.join(self.raw_dir, self.dirname)
+
+        config = ConfigParser()
+        config.read(os.path.join(self.project_dir,'config.ini'))
+
+        #read tokens form config file
+        self.consumer_key = config.get('AUTH', 'consumer_key')
+        self.consumer_secret = config.get('AUTH', 'consumer_secret')
+        self.access_token = config.get('AUTH', 'access_token')
+        self.access_token_secret = config.get('AUTH', 'access_token_secret')
+        auth = OAuthHandler(self.consumer_key, self.consumer_secret)  # creating an OAuthHandler instance
+        auth.set_access_token(self.access_token, self.access_token_secret)
+        self.api=tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
