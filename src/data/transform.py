@@ -30,7 +30,7 @@ class CSSETransformer(CSSEReader, Transformer):
         logger = logging.getLogger(__name__)
         logger.info('Splitting raw data into time series and ancillary part.')
 
-        file_dir = os.path.join(self.raw_dir_csse, "US")
+        file_dir = os.path.join(self.raw_dir, self.dirname, "US")
         # process
         for file in os.listdir(file_dir):
             # read csv
@@ -59,11 +59,11 @@ class CSSETransformer(CSSEReader, Transformer):
 
             # save to csv
             ts_clean.to_csv(
-                os.path.join(self.project_dir, self.processed_dir_csse, "US",
-                             file.split('.')[0] + '_timeseries.csv'))
+                os.path.join(self.project_dir, self.processed_dir, self.dirname,
+                             "US", file.split('.')[0] + '_timeseries.csv'))
             ancillary_clean.to_csv(
-                os.path.join(self.project_dir, self.processed_dir_csse, "US",
-                             file.split('.')[0] + '_ancillary.csv'))
+                os.path.join(self.project_dir, self.processed_dir, self.dirname,
+                             "US", file.split('.')[0] + '_ancillary.csv'))
         return None
 
     def processed2ds(self):
@@ -140,4 +140,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # run
-    CSSETransformer(dirname='csse').processed2ds()
+    CSSETransformer(dirname='csse').raw2processed()

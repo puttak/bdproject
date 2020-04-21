@@ -16,6 +16,7 @@ from configparser import ConfigParser
 from tweepy import OAuthHandler
 import tweepy
 
+
 class Data(object):
     """
     Implements basic data structure.
@@ -49,10 +50,10 @@ class Downloader(Data):
         self.web_dir = webdir
         assert isinstance(self.web_dir, str)
 
-    def fetch_data(self):
+    def fetch_data(self, *args):
         raise NotImplementedError
 
-    def save_data(self):
+    def save_data(self, *args):
         raise NotImplementedError
 
 
@@ -63,10 +64,10 @@ class Reader(Data):
     def __init__(self):
         Data.__init__(self)
 
-    def read_raw(self):
+    def read_raw(self, *args):
         raise NotImplementedError
 
-    def read_processed(self):
+    def read_processed(self, *args):
         raise NotImplementedError
 
 
@@ -77,7 +78,7 @@ class Transformer(Reader):
     def __init__(self):
         Reader.__init__(self)
 
-    def raw2processed(self):
+    def raw2processed(self, *args):
         raise NotImplementedError
 
 
@@ -97,12 +98,7 @@ class CSSE(Data):
         super(CSSE, self).__init__()  # alternative: Data.__init__(self)
         self.dirname = dirname
 
-        # at this stage, re-define dirs based on dirname variable
-        self.processed_dir_csse = os.path.join(self.processed_dir, self.dirname)
-        self.raw_dir_csse = os.path.join(self.raw_dir, self.dirname)
-
         # define file name structure
-
         self.fname_confirmed_raw = "time_series_covid19_confirmed_US.csv"
         self.fname_deaths_raw = "time_series_covid19_deaths_US.csv"
 
@@ -119,7 +115,6 @@ class CSSE(Data):
             "time_series_covid19_deaths_US_ancillary.csv"
 
 
-
 class TwitterNews(Data):
     def __init__(self, dirname):
         """
@@ -134,21 +129,24 @@ class TwitterNews(Data):
         super(TwitterNews, self).__init__()
         self.dirname = dirname
 
-        # at this stage, re-define dirs based on dirname variable
-        self.processed_dir_twitternews = os.path.join(self.processed_dir, self.dirname)
-        self.raw_dir_twitternews = os.path.join(self.raw_dir, self.dirname)
-
         config = ConfigParser()
-        config.read(os.path.join(self.project_dir,'config.ini'))
+        config.read(os.path.join(self.project_dir, 'config.ini'))
 
-        #read tokens form config file
-        self.consumer_key = config.get('AUTH', 'consumer_key')
-        self.consumer_secret = config.get('AUTH', 'consumer_secret')
-        self.access_token = config.get('AUTH', 'access_token')
-        self.access_token_secret = config.get('AUTH', 'access_token_secret')
-        auth = OAuthHandler(self.consumer_key, self.consumer_secret)  # creating an OAuthHandler instance
-        auth.set_access_token(self.access_token, self.access_token_secret)
-        self.api=tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        #read tokens from config file
+        self.__consumer_key = config.get('AUTH', 'consumer_key')
+        self.__consumer_secret = config.get('AUTH', 'consumer_secret')
+        self.__access_token = config.get('AUTH', 'access_token')
+        self.__access_token_secret = config.get('AUTH', 'access_token_secret')
 
+        # creating an OAuthHandler instance
+        self.auth = OAuthHandler(self.__consumer_key,
+                                 self.__consumer_secret)
+        self.auth.set_access_token(self.__access_token,
+                                   self.__access_token_secret)
+        self.api = tweepy.API(self.auth,
+                              wait_on_rate_limit=True,
+                              wait_on_rate_limit_notify=True)
 
-
+if __name__ == "__main__":
+    c = TwitterNews(dirname="twitter_news")
+    print(c.api)

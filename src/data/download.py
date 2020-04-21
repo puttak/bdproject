@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup # package for parsing HTML
 import pickle
 import csv
 
+
 class CSSEDownloader(CSSE, Downloader):
     def __init__(self, dirname):
         CSSE.__init__(self, dirname)
@@ -54,8 +55,10 @@ class CSSEDownloader(CSSE, Downloader):
         # iterate over dictionary of data frames and save to csv
         for category in data.keys():
             fname = "time_series_covid19_{type}_US.csv".format(type=category)
-            data[category].to_csv(os.path.join(self.raw_dir_csse, 'US', fname))
+            data[category].to_csv(os.path.join(self.raw_dir, self.dirname,
+                                               'US', fname))
         return None
+
 
 class TwitterNewsDownloader(TwitterNews, Downloader):
     def __init__(self, dirname):
@@ -63,23 +66,16 @@ class TwitterNewsDownloader(TwitterNews, Downloader):
         Downloader.__init__(self)
 
         self.dirname = dirname
-        self.web_dir = os.path.join(
-            "https://raw.githubusercontent.com",
-            "CSSEGISandData",
-            "COVID-19",
-            "master",
-            "csse_covid_19_data",
-            "csse_covid_19_time_series")
 
     def fetch_data(self, usernames):
         """
-                Fetch news articles from all users in usernames
+        Fetch news articles from all users in usernames
 
-                Returns
-                -------
-                articles : pd.DataFrame
-                    Time series data of all articles of a specific user - time resolution: one day
-                """
+        Returns
+        -------
+        articles : pd.DataFrame
+            Time series data of all articles of a specific user - time resolution: one day
+        """
         #got through all users
         for user in usernames:
             file=os.path.join(self.raw_dir, self.dirname, user + '.p')
@@ -134,15 +130,7 @@ class TwitterNewsDownloader(TwitterNews, Downloader):
 
             pickle.dump(articles, open(file, "wb"))
 
-
-#
-
-
-
-
-
     def scrape_twitter(self, user, since):
-
         tweets = []
         tweetCriteria = got.manager.TweetCriteria().setUsername(user) \
             .setSince(since) \
@@ -152,15 +140,14 @@ class TwitterNewsDownloader(TwitterNews, Downloader):
         tweets = got.manager.TweetManager.getTweets(tweetCriteria)
         return tweets
 
-
     def save_data(self, usernames):
         self.fetch_data(usernames)
         print(self.project_dir)
 
 
-
 if __name__ == "__main__":
     downloader = CSSEDownloader(dirname="csse")
     downloader.save_data()
-    #twitterdownloader=TwitterNewsDownloader(dirname="twitter_news")
-    #twitterdownloader.save_data(usernames=["nytimes")
+
+    twitter_downloader = TwitterNewsDownloader(dirname='twitter_news')
+    twitter_downloader.save_data(usernames=['realDonaldTrump'])
