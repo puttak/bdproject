@@ -34,8 +34,8 @@ class CSSEDownloader(CSSE, Downloader):
         """
         data = {}
 
-        self.path_confirmed = os.path.join(self.web_dir, self.fname_confirmed)
-        self.path_deaths = os.path.join(self.web_dir, self.fname_deaths)
+        self.path_confirmed = os.path.join(self.web_dir, self.fname_confirmed_raw)
+        self.path_deaths = os.path.join(self.web_dir, self.fname_deaths_raw)
 
         data['confirmed'] = pd.read_csv(self.path_confirmed)
         data['deaths'] = pd.read_csv(self.path_deaths)

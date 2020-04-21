@@ -102,8 +102,21 @@ class CSSE(Data):
         self.raw_dir_csse = os.path.join(self.raw_dir, self.dirname)
 
         # define file name structure
-        self.fname_confirmed = "time_series_covid19_confirmed_US.csv"
-        self.fname_deaths = "time_series_covid19_deaths_US.csv"
+
+        self.fname_confirmed_raw = "time_series_covid19_confirmed_US.csv"
+        self.fname_deaths_raw = "time_series_covid19_deaths_US.csv"
+
+        # processed timeseries data
+        self.fname_confirmed_processed = \
+            "time_series_covid19_confirmed_US_timeseries.csv"
+        self.fname_deaths_processed = \
+            "time_series_covid19_deaths_US_timeseries.csv"
+
+        # processed ancillary data
+        self.fname_confirmed_processed_ancillary = \
+            "time_series_covid19_confirmed_US_ancillary.csv"
+        self.fname_deaths_processed_ancillary = \
+            "time_series_covid19_deaths_US_ancillary.csv"
 
 
 
@@ -136,3 +149,6 @@ class TwitterNews(Data):
         auth = OAuthHandler(self.consumer_key, self.consumer_secret)  # creating an OAuthHandler instance
         auth.set_access_token(self.access_token, self.access_token_secret)
         self.api=tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+
+
+
