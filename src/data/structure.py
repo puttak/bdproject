@@ -115,7 +115,7 @@ class CSSE(Data):
             "time_series_covid19_deaths_US_ancillary.csv"
 
 
-class TwitterNews(Data):
+class Twitter(Data):
     def __init__(self, dirname):
         """
         Initialize class with Tweepy credentials
@@ -126,7 +126,7 @@ class TwitterNews(Data):
 
         """
         # initialise mother class: now this class inherited the Data class
-        super(TwitterNews, self).__init__()
+        super(Twitter, self).__init__()
         self.dirname = dirname
 
         config = ConfigParser()
@@ -147,6 +147,13 @@ class TwitterNews(Data):
                               wait_on_rate_limit=True,
                               wait_on_rate_limit_notify=True)
 
+        # test authentication
+        try:
+            self.api.verify_credentials()
+            print("Twitter Authentication OK")
+        except:
+            print("Error during authentication")
+
 if __name__ == "__main__":
-    c = TwitterNews(dirname="twitter_news")
+    c = Twitter(dirname="twitter_news")
     print(c.api)
