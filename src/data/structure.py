@@ -147,6 +147,47 @@ class Twitter(Data):
                               wait_on_rate_limit=True,
                               wait_on_rate_limit_notify=True)
 
+        # ---
+        # define data types of the columns in the common df_tweet structure
+        # see https://numpy.org/devdocs/user/basics.types.html
+        # ---
+        # uInt64 vs uint64:
+        # uInt64: NaNs are possible (pandas dtype)
+        # uint64: Nan are not possible (numpy dtype)
+        # ---
+        # Note: Use a Categorical for efficient storage of an
+        # object-dtype column with many repeated values.
+        self.tweet_df_types = {'id': 'uint64',
+                               'id_str': 'uint64',
+                               'full_text': 'string',
+                               'truncated': 'bool',
+                               'display_text_range': 'object',
+                               'entities': 'object',  # dictionary
+                               'source': 'string',
+                               'in_reply_to_status_id': 'float32',
+                               'in_reply_to_status_id_str': 'string',
+                               'in_reply_to_user_id': 'float32',
+                               'in_reply_to_user_id_str': 'string',
+                               'in_reply_to_screen_name': 'string',
+                               'user': 'object',  # dictionary
+                               'geo': 'object',  # ?
+                               'coordinates': 'object',  # ?
+                               'place': 'object',  # ?
+                               'contributors': 'object',  # ?
+                               'is_quote_status': 'bool',
+                               'quoted_status_id': 'float32',
+                               'quoted_status_id_str': 'string',
+                               'quoted_status_permalink': 'object',
+                               'quoted_status': 'object',  # dictionary
+                               'retweet_count': 'uint64',
+                               'favorite_count': 'uint64',
+                               'favorited': 'bool',
+                               'retweeted': 'bool',
+                               'possibly_sensitive': 'bool',
+                               'possibly_sensitive_appealable': 'bool',
+                               'lang': 'string',
+                               'extended_entities': 'object'}  # dictionary
+
         # test authentication
         try:
             self.api.verify_credentials()
@@ -156,4 +197,5 @@ class Twitter(Data):
 
 if __name__ == "__main__":
     c = Twitter(dirname="twitter_news")
-    print(c.api)
+    print(c.tweet_df_types)
+

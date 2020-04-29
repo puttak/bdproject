@@ -158,7 +158,8 @@ class TwitterUserDownloader(Twitter, Downloader):
         Twitter.__init__(self, dirname)
         Downloader.__init__(self)
 
-        self.dirname = dirname
+        self.dirname = dirname  # data dir name
+        self.fetched_tweets = None  # to store the tweets fetched
 
     def set_tweet_criteria(self, user, since):
         # GetOldTweets module
@@ -174,12 +175,20 @@ class TwitterUserDownloader(Twitter, Downloader):
         # dict to store tweet df's for all users
         dict_out = {}
 
+        # TODO: here, make sure to write to the disk so that we circumvent
+        #  timeouts of the internet connection or any other issues
         for user in user_names:
-            fpath = os.path.join(self.raw_dir, self.dirname, 'tweets_users.pkl')
+            # TODO: this could be neatly parallelised to fetch the tweets  of
+            #  as many users as cores are available on the machine
+            #  simultaneously
+            print("User: {}".format(user))
+            #fpath = os.path.join(self.raw_dir, self.dirname, 'tweets_users.pkl')
 
             # If file of user exists start searching for tweets at date where
             # last search ended until today
             # -----------------------------------------------------------------
+            # TODO: fix checking if data already exists and if yes, until when
+            """
             if os.path.isfile(fpath):
                 articles = pickle.load(open(fpath, "rb"))
                 last_date = str(max(articles.keys()))
@@ -203,6 +212,13 @@ class TwitterUserDownloader(Twitter, Downloader):
                 tweet_criteria = self.set_tweet_criteria(user=user,
                                                          since=start_date)
                 tweets = got.manager.TweetManager.getTweets(tweet_criteria)
+            """
+
+            # set tweet criteria for scraping
+            tweet_criteria = self.set_tweet_criteria(user=user,
+                                                     since=start_date)
+            tweets = got.manager.TweetManager.getTweets(tweet_criteria)
+            n_tweets = len(tweets)
 
             # collect all tweets for one user in a df
             df_user = pd.DataFrame()
@@ -210,9 +226,12 @@ class TwitterUserDownloader(Twitter, Downloader):
             # iterate over tweets
             # tweet_mode='extended' -> contains the entire untruncated text
             # -----------------------------------------------------------------
-            print("retrieving tweets")
+            print("  retrieving tweets")
             try:
                 for n, tweet_scrape in enumerate(tweets):
+                    print("    fetching tweet {n} of {nsum} tweets".format(
+                        n=n, nsum=n_tweets))
+                    # get json via tweepy api
                     tweet = self.api.get_status(tweet_scrape.id,
                                                 tweet_mode='extended',
                                                 wait_on_rate_limit=True,
@@ -226,42 +245,44 @@ class TwitterUserDownloader(Twitter, Downloader):
                     # 2. Concatenate df_tweet to df_out
                     df_user = pd.concat([df_tweet, df_user], axis=1)
 
-            # the error arises when the user has protected tweets
-            except tweepy.TweepError:
-                print("Failed to run the command on user {}".format(user))
-
             # except if RateLimitError arises
             except tweepy.RateLimitError:
                 print("resource usage limit: {} skipped".format(user))
                 time.sleep(5 * 60)  # wait a few mins
 
-            print("cleaning")
-            # transpose
-            df_user = df_user.transpose()
+            # the error arises when the user has protected tweets
+            except tweepy.TweepError:
+                print("Failed to run the command on user {}".format(user))
 
-            # try auto-inferring dtypes to cast columns from dtype
-            # "object" to more appropriate and memory-efficient dtypes
-            # TODO: not sure if this is really efficient. we might as well
-            #  hardcode this step if the structure always stays the same
-            df_user = df_user.infer_objects()
+            if df_user.empty:
+                df_user = None
+            else:
+                print("  tidying tweet data")
+                # transpose
+                df_user = df_user.transpose()
 
-            # manually deal with the remaining column dtypes
-            df_user['created_at'] = pd.to_datetime(df_user['created_at'])
+                # set index column
+                df_user['created_at'] = pd.to_datetime(df_user['created_at'])
+                df_user = df_user.set_index('created_at')
 
-            # set datetime index
-            df_user = df_user.set_index('created_at')
-        dict_out[user] = df_user
+                # set optimal dtypes (~ 21% less storage needed)
+                for col in df_user.columns:
+                    df_user[col] = df_user[col].astype(self.tweet_df_types[col])
+
+            # store data for each user in dict
+            dict_out[user] = df_user
         self.fetched_tweets = dict_out
         return self
 
     def save_data(self, fname='user_tweets.pkl'):
         # fetch tweets
-        try:
+        if self.fetched_tweets is not None:
             fpath = os.path.join(self.raw_dir, self.dirname, fname)
             pickle.dump(self.fetched_tweets, open(fpath, "wb"))
-            print("Data saved to {}".format(fpath))
-        except:
-            "The data that you tried to save was not fetched yet."
+            print("Done! Tweet data was saved to {}".format(fpath))
+        else:
+            raise IOError("The data that you tried to save"
+                          "has not been fetched yet. Run 'fetch_tweets' first.")
         return None
 
 
@@ -273,16 +294,28 @@ if __name__ == "__main__":
     # twitter news data
     #twitter_downloader = TwitterNewsDownloader(dirname='twitter_news')
     #twitter_downloader.save_data(usernames=['nytime'])
-
+    """
     # twitter user data
+    start_time = time.time()
     twitter_user = TwitterUserDownloader(dirname='twitter_news')
-    twitter_user.fetch_data(user_names=['realDonaldTrump'],
-                            start_date="2020-04-25")
+    twitter_user.fetch_data(user_names=['realDonaldTrump', 'JoeBiden'],
+                            start_date="2020-01-01")
 
     # save
-    twitter_user.save_data()
+    twitter_user.save_data(fname='trump_biden_tweets.pkl')
+    execution_time = time.time() - start_time
+    print('executed in {:.2f} seconds.'.format(execution_time)) 
+    # ['realDonaldTrump', 'JoeBiden'] from "2020-01-01" onwards
+    # took ~ 27 minutes as of 29.04.2020
+    """
+    # read the fetched tweets again
+    f = "/Users/felix/ETH/code/bdproject/data/" \
+        "raw/twitter_news/trump_biden_tweets.pkl"
+    tweet_data = pd.read_pickle(f)
+    print(type(tweet_data))
 
-    # read again
-    data = pd.read_pickle("/Users/felix/ETH/code/bdproject/data"
-                          "/raw/twitter_news/user_tweets.pkl")
-    print(data)
+    # memory usage in MB
+    print("nbytes Trump: {} MB".format(
+        tweet_data['realDonaldTrump'].memory_usage().sum() / 1000000))
+    print("nbytes Biden: {} MB".format(
+        tweet_data['JoeBiden'].memory_usage().sum() / 1000000))

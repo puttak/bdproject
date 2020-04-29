@@ -78,6 +78,7 @@ def compute_sentiment(series, all=False):
         return sid.polarity_scores(series)['compound']
     return sid.polarity_scores(series)
 
+
 def normalize_text(text):
     """
     Process text to clean list of tokens.
