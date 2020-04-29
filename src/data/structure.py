@@ -118,12 +118,13 @@ class CSSE(Data):
 class Twitter(Data):
     def __init__(self, dirname):
         """
-        Initialize class with Tweepy credentials
+        Initialize class with twitter API credentials.
 
         Parameters
         ----------
-         : str
-
+        dirname : str
+            Name of the data directory. Let's use 'twitter_news' and
+            'twitter_users'.
         """
         # initialise mother class: now this class inherited the Data class
         super(Twitter, self).__init__()
@@ -157,18 +158,19 @@ class Twitter(Data):
         # ---
         # Note: Use a Categorical for efficient storage of an
         # object-dtype column with many repeated values.
+        # TODO: re-code remaining 'object' dtypes if feasible
         self.tweet_df_types = {'id': 'uint64',
                                'id_str': 'uint64',
-                               'full_text': 'string',
+                               'full_text': 'str',
                                'truncated': 'bool',
                                'display_text_range': 'object',
                                'entities': 'object',  # dictionary
-                               'source': 'string',
+                               'source': 'str',
                                'in_reply_to_status_id': 'float32',
-                               'in_reply_to_status_id_str': 'string',
+                               'in_reply_to_status_id_str': 'str',
                                'in_reply_to_user_id': 'float32',
-                               'in_reply_to_user_id_str': 'string',
-                               'in_reply_to_screen_name': 'string',
+                               'in_reply_to_user_id_str': 'str',
+                               'in_reply_to_screen_name': 'str',
                                'user': 'object',  # dictionary
                                'geo': 'object',  # ?
                                'coordinates': 'object',  # ?
@@ -176,7 +178,7 @@ class Twitter(Data):
                                'contributors': 'object',  # ?
                                'is_quote_status': 'bool',
                                'quoted_status_id': 'float32',
-                               'quoted_status_id_str': 'string',
+                               'quoted_status_id_str': 'str',
                                'quoted_status_permalink': 'object',
                                'quoted_status': 'object',  # dictionary
                                'retweet_count': 'uint64',
@@ -185,7 +187,7 @@ class Twitter(Data):
                                'retweeted': 'bool',
                                'possibly_sensitive': 'bool',
                                'possibly_sensitive_appealable': 'bool',
-                               'lang': 'string',
+                               'lang': 'str',
                                'extended_entities': 'object'}  # dictionary
 
         # test authentication
@@ -196,6 +198,5 @@ class Twitter(Data):
             print("Error during authentication")
 
 if __name__ == "__main__":
-    c = Twitter(dirname="twitter_news")
+    c = Twitter(dirname="twitter_users")
     print(c.tweet_df_types)
-
