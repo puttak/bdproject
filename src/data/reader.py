@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import xarray as xr
-from src.data.structure import Reader, CSSE
+from src.data.structure import Reader, CSSE, Twitter
 
 
 class CSSEReader(CSSE, Reader):
@@ -112,7 +112,30 @@ class CSSEReader(CSSE, Reader):
         return xr.open_dataset(fpath, engine='netcdf4')
 
 
+class TwitterReader(Twitter, Reader):
+    def __init__(self, dirname):
+        """"""
+        Twitter.__init__(self, dirname)
+        Reader.__init__(self)
+
+        self.dirname = dirname
+
+    def read_raw(self):
+        fpath = os.path.join(self.raw_dir, self.dirname, 'user_tweets.pkl')
+        return pd.read_pickle(fpath)
+
+    def read_processed(self):
+        fpath = os.path.join(
+            self.processed_dir, self.dirname, 'user_tweets.pkl')
+        return pd.read_pickle(fpath)
+
+    def read_sentiments(self):
+        fpath = os.path.join(
+            self.processed_dir, "sentiments", 'user_tweets_sentiments.pkl')
+        return pd.read_pickle(fpath)
+
+
 if __name__ == "__main__":
-    reader = CSSEReader(dirname='csse')
-    ds = reader.read_processed2ds()
-    print(ds)
+    reader = TwitterReader(dirname='twitter_user')
+    ds = reader.read_sentiments()
+    print(ds['JoeBiden'])

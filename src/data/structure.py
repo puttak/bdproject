@@ -193,7 +193,6 @@ class Twitter(Data):
         # test authentication
         try:
             self.api.verify_credentials()
-            print("Twitter Authentication OK")
         except:
             print("Error during authentication")
 

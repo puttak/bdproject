@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import logging
+import pickle
 import numpy as np
 import pandas as pd
 import xarray as xr
-from src.utils.paths import get_parent_dir
+from src.utils.paths import check_create_dir
 from src.data.structure import Transformer, CSSE
-from src.data.reader import CSSEReader
+from src.data.reader import CSSEReader, TwitterReader
+from src.features.text import normalize_text, connect_tokens
 
 
 class CSSETransformer(CSSEReader, Transformer):
@@ -135,9 +137,48 @@ class CSSETransformer(CSSEReader, Transformer):
             os.remove(fpath)
         ds.to_netcdf(fpath, mode='w', encoding=encoding, engine='netcdf4')
 
+
+class TwitterTransformer(TwitterReader, Transformer):
+    def __init__(self, dirname):
+        TwitterReader.__init__(self, dirname)
+        Transformer.__init__(self)
+        self.dirname = dirname
+
+    def raw2processed(self):
+        logger = logging.getLogger(__name__)
+        reader = TwitterReader(dirname=self.dirname)
+        raw_data = reader.read_raw()
+
+        processed_data = {}
+        for user_name, user_data in raw_data.items():
+            # copy raw data
+            user_data_clean = user_data.copy()
+
+            # overwrite and connect tokens to yield a string separated by
+            # whitespace because sentiment analysis requires the whole
+            # text strings.
+            user_data_clean['full_text'] = (user_data['full_text']
+                                            .apply(normalize_text)
+                                            .apply(connect_tokens))
+
+            processed_data[user_name] = user_data_clean  # store
+
+        # save to pkl
+        out_dir = os.path.join(self.project_dir, self.processed_dir, self.dirname)
+        check_create_dir(out_dir)
+        fpath = os.path.join(out_dir, "user_tweets.pkl")
+
+        # TODO: check if it is really in append mode
+        pickle.dump(processed_data, open(fpath, "wb"))
+        print("Transformed data was saved to {}".format(fpath))
+        logger.info('Updating twitter user data.')
+        return None
+
+
 if __name__ == '__main__':
+    from pprint import pprint
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # run
-    CSSETransformer(dirname='csse').raw2processed()
+    TwitterTransformer(dirname='twitter_user').raw2processed()

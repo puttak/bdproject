@@ -18,3 +18,8 @@ def get_parent_dir(up=1):
     """
     return str(Path(__file__).resolve().parents[up])
 
+
+def check_create_dir(directory):
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+    return None
