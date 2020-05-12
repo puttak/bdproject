@@ -99,7 +99,7 @@ class CSSEReader(CSSE, Reader):
         df = pd.read_csv(fpath, index_col=[0])
         return df
 
-    def read_processed2ds(self):
+    def read_processed_nc(self):
         """
         Read CSSE data to xr.Dataset object.
 

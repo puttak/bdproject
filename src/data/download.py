@@ -306,22 +306,3 @@ if __name__ == "__main__":
     # twitter news data
     #twitter_downloader = TwitterNewsDownloader(dirname='twitter_news')
     #twitter_downloader.save_data(usernames=['nytime'])
-
-    """
-    # twitter user data
-    twitter_user = TwitterUserDownloader(dirname='twitter_user')
-    twitter_user.fetch_data(user_names=['realDonaldTrump', 'JoeBiden'],
-                            start_date="2020-01-01")
-    twitter_user.save_data(fname='user_tweets.pkl')
-
-    # time
-    execution_time = time.time() - start_time
-    print('Executed in {}.'.format(
-        time.strftime('%H:%M:%S', time.gmtime(execution_time))))
-    """
-
-    # read the fetched tweets again
-    f = "/Users/felix/ETH/code/bdproject/data/" \
-        "raw/twitter_user/user_tweets.pkl"
-    tweet_data = pd.read_pickle(f)
-    print(tweet_data)

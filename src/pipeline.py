@@ -25,10 +25,12 @@ def run_pipeline():
     csse.save_data()
 
     # Twitter user data
+    """
     twitter_user = TwitterUserDownloader(dirname='twitter_user')
     twitter_user.fetch_data(user_names=['realDonaldTrump', 'JoeBiden'],
                             start_date="2020-01-01")
     twitter_user.save_data()
+    """
 
     # 2) transform data
     # -------------------------------------------------------------------------
@@ -36,17 +38,17 @@ def run_pipeline():
     # CSSE COVID-19 data
     csse_transformer = CSSETransformer(dirname='csse')
     csse_transformer.raw2processed()
-    csse_transformer.processed2ds()
+    csse_transformer.processed2nc()
 
     # Twitter user data
-    TwitterTransformer(dirname='twitter_user').raw2processed()
+    #TwitterTransformer(dirname='twitter_user').raw2processed()
 
     # 3) extract features
     # -------------------------------------------------------------------------
 
     # Twitter user data
-    features = TwitterFeatures('twitter_user')
-    features.calculate_sentiments()
+    #features = TwitterFeatures('twitter_user')
+    #features.calculate_sentiments()
 
 
     # -------------------------------------------------------------------------

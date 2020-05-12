@@ -68,7 +68,7 @@ class CSSETransformer(CSSEReader, Transformer):
                              "US", file.split('.')[0] + '_ancillary.csv'))
         return None
 
-    def processed2ds(self):
+    def processed2nc(self):
         """
         Creates xr.Dataset based on pre-processed time series data. For each
         variable, it stores the time series data as 2D arrays with dimension
