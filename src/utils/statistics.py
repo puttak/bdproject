@@ -1,6 +1,18 @@
 import numpy as np
 import pandas as pd
-from scipy.stats import pearsonr
+from scipy.stats import kendalltau, pearsonr, spearmanr
+
+
+def kendall_pval(x, y):
+    return kendalltau(x, y)[1]
+
+
+def pearsonr_pval(x, y):
+    return pearsonr(x, y)[1]
+
+
+def spearmanr_pval(x, y):
+    return spearmanr(x, y)[1]
 
 
 def correlation_matrix(df):
