@@ -7,7 +7,8 @@ from src.utils.statistics import correlation_matrix
 sns.set(style="white")
 
 
-def correlation_matrix_plot(df, significance_level=0.05, cbar_levels=8):
+def correlation_matrix_plot(df, significance_level=0.05, cbar_levels=8,
+                            figsize=(6,6)):
     """Plot corrmat considering p-vals."""
     corr, pvals = correlation_matrix(df)
 
@@ -21,7 +22,7 @@ def correlation_matrix_plot(df, significance_level=0.05, cbar_levels=8):
     # plot
     # -------------------------------------------------------------------------
     # define correct cbar height and pass to sns.heatmap function
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=figsize)
     cbar_kws = {"fraction": 0.046, "pad": 0.04}
     sns.heatmap(corr,
                 mask=mask,
