@@ -43,3 +43,38 @@ def correlation_matrix(df):
 
     return (correlations.apply(pd.to_numeric),
             p_values.apply(pd.to_numeric))
+
+
+def lag_features(df, n_lags=1):
+    df_lagged = df.copy()
+
+    for lag in range(1, n_lags + 1):
+        shifted = df.shift(lag)
+        shifted.columns = [x + "_lag" + str(lag) for x in df.columns]
+
+        df_lagged = pd.concat((df_lagged, shifted), axis=1)
+    return df_lagged
+
+
+def calc_lagmeans(s, lags):
+    """
+    Calculates for each observation the mean of the previous x months, for each
+    x in lags Assumes that the input series has evenly spaced temporal intervals
+
+    :param s: pandas.Series
+        Time series of which to calculate lag avarages of.
+    :param lags: list
+        list of lags for which to calculate the average for.
+    :return: pandas.Dataframe
+        data frame with a column for each lag
+        The columns are padded at the beginning such that they
+        all have the length of the input series
+    """
+    csum = s.cumsum().values
+    csum = np.insert(csum, 0, 0)
+    out_df = pd.DataFrame(index=s.index)
+    for lag in lags:
+        lagsum = csum[lag:] - csum[:-lag]
+        lagsum = np.insert(lagsum, 0, np.nan * np.ones(lag-1))
+        out_df['lagmean_' + str(lag)] = lagsum/lag
+    return out_df
