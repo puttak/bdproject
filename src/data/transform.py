@@ -96,17 +96,16 @@ class CSSETransformer(CSSEReader, Transformer):
         ts_deaths = self.read_processed(variable='deaths')
 
         # clean up suspect "Unnamed" columns so we can convert to numeric types
+        # fips codes 3252 und 3148 don't exist
         dfs_clean = {}
         for var, df in zip(['confirmed', 'deaths'], [ts_confirmed, ts_deaths]):
             search = np.array(["Unnamed" in x for x in df.columns.values])
-            cols = df.columns[search].values
 
-            coldict = {}
-            for col in cols:
-                coldict[col] = [int(s) for s in col.split() if s.isdigit()][0]
+            # drop cols with non-existing county FIPS codes
+            df = df.drop(labels=df.columns[search].values, axis=1)
 
-            df = df.rename(columns=coldict)
             df.columns = pd.to_numeric(df.columns, downcast='integer')
+            df = df[df.columns.sort_values()]
             dfs_clean[var] = df
 
         # recast cleaned dfs
@@ -114,8 +113,10 @@ class CSSETransformer(CSSEReader, Transformer):
         ts_deaths = dfs_clean['deaths']
 
         # tests
-        assert np.alltrue(ts_confirmed.columns == ts_deaths.columns)
-        assert np.alltrue(ts_confirmed.index == ts_deaths.index)
+        assert np.alltrue(
+            ts_confirmed.columns.values == ts_deaths.columns.values)
+        assert np.alltrue(
+            ts_confirmed.index == ts_deaths.index)
 
         # construct xr.Dataset
         times = ts_confirmed.index.values
@@ -181,4 +182,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # run
-    TwitterTransformer(dirname='twitter_user').raw2processed()
+    CSSETransformer(dirname='csse').processed2nc()
