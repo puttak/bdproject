@@ -297,12 +297,183 @@ class TwitterUserDownloader(Twitter, Downloader):
         return None
 
 
+# just a test
+class TwitterGeoDownloader(Twitter, Downloader):
+    def __init__(self, dirname):
+        Twitter.__init__(self, dirname)
+        Downloader.__init__(self)
+
+        self.dirname = dirname  # data dir name
+        self.fetched_tweets = None  # to store the tweets fetched
+        self.default_fname = 'geo_tweets.pkl'
+        self.fpath = os.path.join(self.raw_dir, self.dirname, self.default_fname)
+        self.end_date = datetime.today().strftime('%Y-%m-%d')
+
+    #@staticmethod
+    def set_tweet_criteria(self, city, date, search_radius="50mi", max_tweets_per_day=100):
+        # GetOldTweets module
+        tweet_criteria = (got.manager.TweetCriteria()
+                          # restrict search to a single day
+                          .setSince(date + " 00:00:00") # start of day
+                          .setUntil(date + " 23:59:59") # end of day
+                          .setEmoji("unicode")
+                          .setNear(near=city)
+                          .setWithin(within=search_radius)
+                          .setMaxTweets(maxTweets=max_tweets_per_day)
+                          #.topTweets(topTweets=True)
+                          )
+        return tweet_criteria
+
+    def fetch_data(self, cities, start_date="2020-01-01", end_date=None):
+        """Fetch tweets for cities"""
+
+        self.start_date = start_date
+        if end_date is not None:
+            self.end_date = end_date
+
+        # create array of dates with daily sampling
+        date_array = pd.date_range(self.start_date,
+                                   self.end_date, freq='D').to_pydatetime()
+        date_array = [date.strftime('%Y-%m-%d') for date in date_array]
+
+        # dict to store tweet df's for all cities
+        dict_out = {}
+
+        # TODO: here, make sure to write to the disk such that we circumvent
+        #  timeouts of the internet connection or any other issues
+        for city in cities:
+            print("City: {}".format(city))
+
+            # if some data is available, check the last tweet fetched and start
+            # scraping from there on
+            # -----------------------------------------------------------------
+            if os.path.isfile(self.fpath):
+                print("  Found existing file. Enabling append mode.")
+                # read existing data
+                existing_data = pd.read_pickle(self.fpath)
+                last_tstamp = existing_data[city].index[-1]
+                search_tstamp = last_tstamp + pd.Timedelta(days=1)
+
+                # continue searching +1 day after the latest timestamp. this is
+                # not optimal, but it works if we make sure to run the fetching
+                # scripts towards the evening.
+                tweet_criteria = self.set_tweet_criteria(
+                    city=city,
+                    date=search_tstamp.strftime("%Y-%m-%d"))
+            else:
+                print("  There is no file yet. Creating a new one.")
+                # tweet criteria for scraping if data does not exist yet
+                tweet_criteria = self.set_tweet_criteria(city=city,
+                                                         date=start_date)
+            # iterate over dates
+            for date in date_array:
+                print(date)
+                # sample n tweets from the given date
+                tweet_criteria = self.set_tweet_criteria(city=city,
+                                                         date=date)
+                print(tweet_criteria.since,
+                      tweet_criteria.until)
+
+                # get got objects of tweets
+                tweets = got.manager.TweetManager.getTweets(tweet_criteria)
+                n_tweets = len(tweets)
+
+                if n_tweets == 0:
+                    print("  No new tweets found for {}.".format(city))
+                    df_city = None
+                    continue  # go to next city
+                else:
+                    print("  Found {} tweets for {}.".format(n_tweets, city))
+                    # collect all tweets for one user in a df
+                    # TODO: initialise df with right size to save memory
+                    df_city = pd.DataFrame()
+
+                    # iterate over tweets
+                    # -----------------------------------------------------------------
+                    print("  retrieving tweets")
+                    try:
+                        for n, tweet_scrape in enumerate(tweets):
+                            print("    fetching tweet {n} of {nsum} tweets".format(
+                                n=n + 1, nsum=n_tweets))
+                            # 1) get json via tweepy api
+                            # tweet_mode='extended' -> entire, untruncated text
+                            tweet = self.api.get_status(tweet_scrape.id,
+                                                        tweet_mode='extended',
+                                                        wait_on_rate_limit=True,
+                                                        timeout=60)  # 60 seconds
+
+                            # 2) Transform the json into a df and store
+                            df_tweet = pd.DataFrame.from_dict(tweet._json,
+                                                              orient='index',
+                                                              columns=[n])
+
+                            # 3) Concatenate df_tweet to df_out
+                            df_city = pd.concat([df_tweet, df_city], axis=1)
+
+                    # except if RateLimitError arises
+                    except tweepy.RateLimitError:
+                        print("resource usage limit: {} skipped".format(city))
+                        time.sleep(5 * 60)  # wait a few mins
+
+                    # the error arises when the user has protected tweets
+                    except tweepy.TweepError:
+                        print("Failed to run the command on city {}".format(city))
+
+                    if df_city.empty:
+                        df_city = None
+                    else:
+                        print("  tidying tweet data")
+                        # transpose
+                        df_user = df_city.transpose()
+
+                        # set index column
+                        df_city['created_at'] = pd.to_datetime(
+                            df_city['created_at'])
+                        df_city = df_city.set_index('created_at')
+
+                        # set optimal dtypes (~ 21% less storage needed)
+                        for col in df_city.columns:
+                            df_city[col] = df_city[col].astype(
+                                self.tweet_df_types[col])
+
+                # store data for each user in dict
+                dict_out[city] = df_city
+            # check if there is at least some new data for one of the users
+            if all(value is None for value in dict_out.values()):
+                self.fetched_tweets = None
+            else:
+                self.fetched_tweets = dict_out
+        return self
+
+    def save_data(self, fname='city_tweets.pkl'):
+        logger = logging.getLogger(__name__)
+
+        # fetch tweets
+        outdir = os.path.join(self.raw_dir, self.dirname)
+        fpath = os.path.join(outdir, fname)
+
+        if self.fetched_tweets is not None:
+            if not os.path.exists(outdir):
+                os.mkdir(outdir)
+            # TODO: check if this is really appending
+            pickle.dump(self.fetched_tweets, open(fpath, "wb"))
+            print("Done! Tweet data was saved to {}".format(fpath))
+            logger.info('Updating twitter user data.')
+        else:
+            print("Nothing to save. There either is no new data available or "
+                  "the data that you tried to save has not been fetched yet.")
+            logger.info('No new twitter user data available.')
+        return None
+
+
 if __name__ == "__main__":
     start_time = time.time()
     # CSSE data
     #downloader = CSSEDownloader(dirname="csse")
     #downloader.save_data()
 
-    # twitter news data
-    #twitter_downloader = TwitterNewsDownloader(dirname='twitter_news')
-    #twitter_downloader.save_data(usernames=['nytime'])
+    # twitter geo city data tests
+    twitter_downloader = TwitterGeoDownloader(dirname='twitter_city')
+    twitter_downloader.fetch_data(cities=['Vienna'],
+                                  start_date="2020-06-01")
+    twitter_downloader.save_data()
