@@ -209,5 +209,8 @@ pip-selfcheck.json
 #private config file
 config.ini
 
-#ignore articles, because they are too large
+#ignore parts of the data folder
 data/processed/twitter_news/
+data/raw/tweets/
+data/interim/tweets/
+data/processed/tweets/
